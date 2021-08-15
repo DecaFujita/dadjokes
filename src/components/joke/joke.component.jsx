@@ -20,12 +20,12 @@ const Joke = props => {
     return(
         <div className='joke'>
             <div className='joke-score'>
-                <i className="fas fa-long-arrow-alt-up joke-icon" onClick={()=>props.higherScore(`${props.id}`)} />
+                <i className="fas fa-long-arrow-alt-up joke-icon" onClick={props.upScore} />
                 <p
                     className='joke-scoreNumber'
                     style={{border: `2px solid ${colour()}`}}
                 >{props.score}</p>
-                <i className="fas fa-long-arrow-alt-down joke-icon" onClick={()=>props.lowerScore(`${props.id}`)} />
+                <i className="fas fa-long-arrow-alt-down joke-icon" onClick={props.downScore} />
             </div>
             <div className='joke-joke'>{props.joke}</div>
         </div>

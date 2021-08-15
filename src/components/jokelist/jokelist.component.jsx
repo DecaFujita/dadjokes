@@ -10,42 +10,38 @@ class JokeList extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            jokes: [] }
+        this.state = { jokes: JSON.parse(window.localStorage.getItem('jokes')) || []};
 }
 
-  async componentDidMount() {
-    let jokes = [];
-
-    while (jokes.length < 10) {
-        let response =  await axios.get('https://icanhazdadjoke.com/', {
-            headers: {accept: 'application/json'}
-        });
-        let data = response.data;
-        jokes.push({joke: data.joke, id: data.id, score : 0});
-    }
-    this.setState({jokes: jokes})
+  componentDidMount() {
+    if (this.state.jokes.length === 0 ) this.getJokes();
 }
 
-higherScore = (id) => {
-  this.setState({jokes: this.state.jokes.map(joke => {
-    if (joke.id === id) {
-      return ({...joke, score: joke.score + 1})
-    } else {
-      return joke
-    }
-  })})
+getJokes = async () => {
+  let jokes = [];
+
+  while (jokes.length < 10) {
+      let response =  await axios.get('https://icanhazdadjoke.com/', {
+          headers: {accept: 'application/json'}
+      });
+      let data = response.data;
+      jokes.push({joke: data.joke, id: data.id, score : 0});
+  }
+  this.setState(st => ({jokes: {...st.jokes, jokes}}),() => window.localStorage.setItem('jokes', JSON.stringify(this.state.jokes)))
 }
 
-lowerScore = (id) => {
-  this.setState({jokes: this.state.jokes.map(joke => {
-    if (joke.id === id) {
-      return ({...joke, score: joke.score - 1})
-    } else {
-      return joke
-    }
-  })})
-}
+  handleScore = (id, delta) => {
+    this.setState(
+      st => ({ 
+      jokes: st.jokes.map(joke =>
+        joke.id === id ? {...joke, score: joke.score + delta} : joke
+    )
+  }), () => window.localStorage.setItem('jokes', JSON.stringify(this.state.jokes)))
+  }
+
+  addJokes = async () => {
+    this.getJokes();
+  }
 
   render() {
     return (
@@ -57,12 +53,13 @@ lowerScore = (id) => {
                 <Joke
                   key={id} 
                   id={id}{...otherJokeProps}
-                  higherScore={this.higherScore}
-                  lowerScore={this.lowerScore}
+                  upScore={() => this.handleScore(id, 1)}
+                  downScore={() => this.handleScore(id,-1)}
                 />
               )
             }
         </div>
+        <button onClick={this.addJokes}>Add new jokes! </button>
       </div>
     )
   }
