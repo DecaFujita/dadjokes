@@ -11,9 +11,7 @@ class JokeList extends React.Component {
         super(props);
 
         this.state = {
-            jokes: [
-              
-            ] }
+            jokes: [] }
 }
 
   async componentDidMount() {
@@ -27,7 +25,27 @@ class JokeList extends React.Component {
         jokes.push({joke: data.joke, id: data.id, score : 0});
     }
     this.setState({jokes: jokes})
-  } 
+}
+
+higherScore = (id) => {
+  this.setState({jokes: this.state.jokes.map(joke => {
+    if (joke.id === id) {
+      return ({...joke, score: joke.score + 1})
+    } else {
+      return joke
+    }
+  })})
+}
+
+lowerScore = (id) => {
+  this.setState({jokes: this.state.jokes.map(joke => {
+    if (joke.id === id) {
+      return ({...joke, score: joke.score - 1})
+    } else {
+      return joke
+    }
+  })})
+}
 
   render() {
     return (
@@ -35,7 +53,14 @@ class JokeList extends React.Component {
         <h1>Dad Jokes</h1>
         <div className='jokelist'>
             {
-                this.state.jokes.map(joke => <Joke key={joke.id} joke={joke.joke} score={joke.score}/>)
+              this.state.jokes.map(({id, ...otherJokeProps}) =>
+                <Joke
+                  key={id} 
+                  id={id}{...otherJokeProps}
+                  higherScore={this.higherScore}
+                  lowerScore={this.lowerScore}
+                />
+              )
             }
         </div>
       </div>
